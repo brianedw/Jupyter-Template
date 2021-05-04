@@ -39,6 +39,9 @@ get_ipython().run_line_magic('autoreload', '2')
 
 # System Imports
 import os, sys, time
+mainQ =(__name__ == '__main__')
+if mainQ:
+    print("This is the main file")
 
 
 # In[ ]:
@@ -89,6 +92,8 @@ import sympy as sp
 # sp.init_printing(pretty_print=False)
 
 
+# ### Plotting
+
 # In[ ]:
 
 
@@ -105,6 +110,20 @@ output_notebook()
 bokeh.io.curdoc().theme = 'dark_minimal'
 
 
+# ## Custom Imports
+
+# In[ ]:
+
+
+from UtilityMath import (plotComplexArray, 
+                         RandomComplexCircularMatrix, RandomComplexGaussianMatrix,
+                         PolarPlot,
+                         RescaleToUnitary,
+                         ReIm,
+                         MatrixSqError, MatrixError, MatrixErrorNormalized)
+from Logger import Logger
+
+
 # ## Code Snippets
 
 # ### Cell Updating
@@ -112,7 +131,7 @@ bokeh.io.curdoc().theme = 'dark_minimal'
 # In[ ]:
 
 
-if False:
+if mainQ and False:
     for f in range(10):
         clear_output(wait=True)
         print(f)
@@ -148,7 +167,7 @@ fig = figure(x_range=(min(xs), max(xs)), y_range=(min(ys), max(ys)),
 fig.xaxis.axis_label = "x (m)"
 fig.yaxis.axis_label = "y (m)"
 fig.line(x=xs, y=ys)
-show(fig)
+if mainQ: show(fig)
 
 
 # In[ ]:
@@ -156,6 +175,8 @@ show(fig)
 
 del ts, xs, ys, fig
 
+
+# ## Work
 
 # In[ ]:
 
