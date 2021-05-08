@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # ~Title~
+# # Setup
 
 # ## Stock Imports
 
 # ### IDE Stuff
+
+# #### Installing New Packages
 
 # In[ ]:
 
@@ -21,8 +23,37 @@
 
 
 # Code for installing packages
-# !conda install --yes --prefix {sys.prefix} sympy
-# !{sys.executable} -m pip install sympy
+# !conda install --yes --prefix {sys.prefix} PACKAGE_NAME
+# !{sys.executable} -m pip install PACKAGE_NAME
+
+
+# #### Notebook Customization
+
+# In[ ]:
+
+
+from IPython.display import HTML
+css_str = """
+<link rel="preconnect" href="https://fonts.gstatic.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Playfair+Display+SC&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+Double+Pica:ital@1&display=swap" rel="stylesheet">
+    <style>
+h1 { color: #7c795d; font-family: 'Playfair Display SC', serif; text-indent: 00px; text-align: center;}
+h2 { color: #7c795d; font-family: 'Lora', serif;                text-indent: 00px; text-align: left; }
+h3 { color: #7c795d; font-family: 'IM Fell Double Pica', serif; text-indent: 15px; text-align: left; }
+h4 { color: #7c795d; font-family: 'Lora', Arial, serif;         text-indent: 30px; text-align: left}
+h5 { color: #71a832; font-family: 'IM Fell Double Pica', serif; text-indent: 45px; text-align: left}
+
+"""
+HTML(css_str)
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
@@ -39,23 +70,95 @@ get_ipython().run_line_magic('autoreload', '2')
 
 # System Imports
 import os, sys, time
-mainQ =(__name__ == '__main__')
-if mainQ:
-    print("This is the main file")
 
 
 # In[ ]:
 
 
-from functools import (reduce, lru_cache, partial)
+mainQ =(__name__ == '__main__')
+if mainQ:
+    print("This is the main file")
+
+
+# ### Functional Programming
+
+# It is very common in data analysis to run data through a series of transformations, often called a "pipe".  The advantage of this is the arguments are contained with the functions and it is more readable.  For instance, in `Mathematica`, 
+# 
+# `H(#, 4)& @ G(#,3)& @ F(#,2)& @ 1  =>  H(G(F(1,2),3),4).`
+# 
+# In the former, it is clear that `3` belongs to `G`.  In the latter, you need to count parenthesis.  This typically makes use of "lambda functions" or "pure functions".  As a primarily Object Oriented Programming (OOP) language, Python doesn't natively support much of this Functional paradigm.  However, it does treat functions as objects which can be manipulated.  Given the utility of Functional Programming, there are several packages that attempt to bring it into the language, each with varying success.
+
+# In[ ]:
+
+
+# from pipetools import where, X, pipe
+# 10 > (pipe | range | where(X % 2) | sum)
+
+
+# In[ ]:
+
+
+# from pipey import Pipeable
+
+# Print = Pipeable(print)
+# @Pipeable
+# def add(a,b): return a + b
+# @Pipeable
+# def sqr(b): return b*b
+
+# np.array([3, 4]) >> sqr >> add(1000)
 
 
 # In[ ]:
 
 
 # from toolz.itertoolz import ()
-from toolz.functoolz import (curry)
+from toolz.functoolz import (curry, pipe, thread_first)
 # from toolz.dicttoolz import ()
+
+
+# In[ ]:
+
+
+@curry
+def add(x, y): return x + y
+@curry
+def pow(x, y): return x**y
+thread_first(1, add(y=4), pow(y=2))  # pow(add(1, 4), 2)
+
+
+# In[ ]:
+
+
+from mini_lambda import InputVar, as_function
+_ = as_function
+X = InputVar('X')
+
+
+# In[ ]:
+
+
+_(X+3)(10)
+
+
+# In[ ]:
+
+
+thread_first(1, add(y=4), _(pow(x=2, y=X)))  # pow(2, add(1, 4))
+
+
+# In[ ]:
+
+
+thread_first(1, _(X+4), _(2**X))  # pow(add(1, 4), 2)
+
+
+# In[ ]:
+
+
+add4 = _(X + 4)
+sqr = _(X**2)
+thread_first( np.array([1,2]), add4, sqr)  # pow(add(1, 4), 2)
 
 
 # ### Scientific Programming
@@ -176,7 +279,19 @@ if mainQ: show(fig)
 del ts, xs, ys, fig
 
 
-# ## Work
+# # Work
+
+# In[ ]:
+
+
+1+1
+
+
+# In[ ]:
+
+
+3+4
+
 
 # In[ ]:
 
