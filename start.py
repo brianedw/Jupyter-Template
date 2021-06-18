@@ -19,20 +19,29 @@
 # * jupyterlab_templates
 
 
+# Depending on how many installations of Python you have on your system, doing a simple `conda install` or `pip install` will put the module in the wrong installation.  This makes sure it lands in the installation corresponding to the current notebook.
+
 # In[ ]:
 
 
 # Code for installing packages
-# !conda install --yes --prefix {sys.prefix} PACKAGE_NAME
-# !{sys.executable} -m pip install PACKAGE_NAME
+# !conda install --yes --prefix {sys.prefix} shapely
+# !{sys.executable} -m pip install plotly
 
 
 # #### Notebook Customization
 
+# This will change the fonts.  I find the rendered mardown heading fonts (H1, H2, H3, etc) to be too similar.  This will alternate between italicized and normal fonts for headings.  Additionally, it adds a small indent that grows with heading level.  H1 is centered.
+
 # In[ ]:
 
 
-from IPython.display import HTML
+import IPython
+
+
+# In[ ]:
+
+
 css_str = """
 <link rel="preconnect" href="https://fonts.gstatic.com">
 
@@ -47,14 +56,10 @@ h4 { color: #7c795d; font-family: 'Lora', Arial, serif;         text-indent: 30p
 h5 { color: #71a832; font-family: 'IM Fell Double Pica', serif; text-indent: 45px; text-align: left}
 
 """
-HTML(css_str)
+IPython.display.HTML(css_str)
 
 
-# In[ ]:
-
-
-
-
+# Allows for changes in packages to be detected and immediately incorporated into the present notebook without resetting the kernel.
 
 # In[ ]:
 
@@ -63,26 +68,115 @@ get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
 
+# By default, Jupyter returns the last expression (and won't return this if it is a statement).  Sometimes we want different behavior that is more similar to Mathematica
+
+# In[ ]:
+
+
+from IPython.core.interactiveshell import InteractiveShell
+
+# pretty print only the last output of the cell
+InteractiveShell.ast_node_interactivity = 'last_expr' # ['all', 'last', 'last_expr', 'none', 'last_expr_or_assign']
+
+
+# In[ ]:
+
+
+x = 2
+y = 3
+
+
+# In[ ]:
+
+
+del x, y
+
+
+# In[ ]:
+
+
+x = 2
+
+
 # ### Python Libraries
 
-# In[ ]:
-
-
-# System Imports
-import os, sys, time
-
+# Standard Python imports
 
 # In[ ]:
 
 
-mainQ =(__name__ == '__main__')
+import os, sys, time, glob
+
+
+# It is a good idea to record the starting working directory before it gets changed around.  Note that this can be problematic depending on how you open the notebook, but it works most of the time.
+
+# In[ ]:
+
+
+baseDir = os.getcwd()
+baseDir
+
+
+# It is also nice to know if what is running is a notebook, or a python script generated from the notebook.
+
+# In[ ]:
+
+
+mainQ = (__name__ == '__main__')
 if mainQ:
     print("This is the main file")
 
 
+# JupyterLab doesn't support navigation to other drives.  This is a handy trick to make folders in other drives "appear" as if they're local.  It even works on network shares.  
+# 
+# PowerShell Command to Map network drives:
+# ```powershell
+# New-Item -ItemType SymbolicLink -Path "c:\users\brianedw\group_share" -Target "\\158.130.53.35\_Group Share"
+# ```
+# 
+
+# ### Notebook Interactivity
+
+# Adds a nice progress bar for visualizing a loop iterator.  See snippets.
+
+# In[ ]:
+
+
+from tqdm import tqdm
+
+
+# Useful for monitoring a calculation's progress.
+
+# In[ ]:
+
+
+from IPython.display import clear_output
+
+
+# In[ ]:
+
+
+for i in range(5):
+    print(i)
+    time.sleep(0.1)
+    clear_output(wait=True)
+
+
+# A nice sound to play when long calculations are completed.
+
+# In[ ]:
+
+
+import winsound
+
+def soundDone():
+    soundfile = "C:/Windows/Media/ring01.wav"
+    winsound.PlaySound(soundfile, winsound.SND_FILENAME | winsound.SND_ASYNC)
+
+
 # ### Functional Programming
 
-# It is very common in data analysis to run data through a series of transformations, often called a "pipe".  The advantage of this is the arguments are contained with the functions and it is more readable.  For instance, in `Mathematica`, 
+# It is very common in data analysis to run data through a series of transformations, often called a "pipe".  The advantage of this is the arguments are contained with the functions and it is more readable (once you get used to it!).  For instance, in `Mathematica`, 
 # 
 # `H(#, 4)& @ G(#,3)& @ F(#,2)& @ 1  =>  H(G(F(1,2),3),4).`
 # 
@@ -108,6 +202,8 @@ if mainQ:
 
 # np.array([3, 4]) >> sqr >> add(1000)
 
+
+# The `toolz` library has a lot of great functions for performing common operations on iterables, functions, and dictionaries.
 
 # In[ ]:
 
@@ -153,14 +249,6 @@ thread_first(1, add(y=4), _(pow(x=2, y=X)))  # pow(2, add(1, 4))
 thread_first(1, _(X+4), _(2**X))  # pow(add(1, 4), 2)
 
 
-# In[ ]:
-
-
-add4 = _(X + 4)
-sqr = _(X**2)
-thread_first( np.array([1,2]), add4, sqr)  # pow(add(1, 4), 2)
-
-
 # ### Scientific Programming
 
 # In[ ]:
@@ -175,9 +263,17 @@ I = 1j              # potentially neater imaginary nomenclature.
 
 
 import numpy as np  # Does high performance dense array operations
+np.set_printoptions(edgeitems=30, linewidth=100000,
+                    formatter=dict(float=lambda x: "%.3g" % x))
 import scipy as sp
 import pandas as pd
 import PIL 
+
+
+# In[ ]:
+
+
+import skimage
 
 
 # In[ ]:
@@ -190,18 +286,18 @@ from numba import njit
 # In[ ]:
 
 
+import numba
+
+
+# In[ ]:
+
+
 import sympy as sp
 # sp.init_printing(pretty_print=True)
 # sp.init_printing(pretty_print=False)
 
 
 # ### Plotting
-
-# In[ ]:
-
-
-from IPython.display import clear_output
-
 
 # In[ ]:
 
@@ -239,6 +335,14 @@ if mainQ and False:
         clear_output(wait=True)
         print(f)
         time.sleep(0.5)
+
+
+# In[ ]:
+
+
+if mainQ and False:
+    for i in tqdm(range(100000000)):
+        pass
 
 
 # ### Bokeh Simple Line Plot
@@ -280,18 +384,6 @@ del ts, xs, ys, fig
 
 
 # # Work
-
-# In[ ]:
-
-
-1+1
-
-
-# In[ ]:
-
-
-3+4
-
 
 # In[ ]:
 
